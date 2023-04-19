@@ -1,27 +1,29 @@
 <template>
-    <div class="w-100 my-4">
-        <div class="header w-100 d-flex justify-content-between">
-            <div class="lists-title w-50">
-                <h2>MY LISTS</h2>
-            </div>
-            <div class="w-25 d-flex justify-content-end">
-                <button class="btn btn-primary">
-                    <i class="fa-solid fa-add"></i>
-                    NEW LIST
-                </button>
-            </div>
+    <div class="w-100">
+        <div class="w-100" v-if="visible">
+            <NewList :visible="visible" />
         </div>
-        <hr />
-        <div class="lists w-100">
-            <div
-                class="w-100"
-                v-for="card in cardDetails"
-                :key="cardDetails.id"
-            >
-                <Cards
-                    :title="card.title"
-                    :date="card.created_at"
-                />
+        <div class="w-100 my-4">
+            <div class="header w-100 d-flex justify-content-between">
+                <div class="lists-title w-50">
+                    <h2>MY LISTS</h2>
+                </div>
+                <div class="w-25 d-flex justify-content-end">
+                    <button class="btn btn-primary" @click="visible = !visible">
+                        <i class="fa-solid fa-add"></i>
+                        NEW LIST
+                    </button>
+                </div>
+            </div>
+            <hr />
+            <div class="lists w-100">
+                <div
+                    class="w-100"
+                    v-for="card in cardDetails"
+                    :key="cardDetails.id"
+                >
+                    <Cards :title="card.title" :date="card.created_at" />
+                </div>
             </div>
         </div>
     </div>
@@ -29,14 +31,17 @@
 
 <script>
 import Cards from "../components/Cards.vue";
+import NewList from "../modules/NewList.vue";
 import axios from "axios";
 export default {
     name: "Lists",
     components: {
         Cards,
+        NewList,
     },
     data() {
         return {
+            visible: false,
             cardDetails: [],
         };
     },

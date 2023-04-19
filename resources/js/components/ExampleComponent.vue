@@ -1,6 +1,7 @@
 <template>
-    <div class="container justify-content-center">
+    <div class="container d-flex justify-content-center">
         <Landing></Landing>
+        
     </div>
 </template>
 
@@ -9,6 +10,7 @@ import Landing from "../screens/Landing.vue";
 export default {
     components: {
         Landing,
+   
     },
 };
 </script>
