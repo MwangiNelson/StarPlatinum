@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ItemModel;
 use App\Models\ListModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -141,5 +142,11 @@ class listController extends Controller
         } else {
             return $this->apiDeliver(404, "No such record was found");
         }
+    }
+
+    public function getItemsFromList($id)
+    {
+        $data = ItemModel::where('list_id', '=', $id)->get();
+        return $this->apiDeliver(200, $data);
     }
 }

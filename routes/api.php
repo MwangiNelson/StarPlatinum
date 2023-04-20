@@ -24,9 +24,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //API's for lists
 Route::get('lists', [listController::class, 'index']);
 Route::get('lists/{id}', [listController::class, 'select']);
+Route::get('todos/{id}', [listController::class, 'getItemsFromList']);
 Route::post('lists', [listController::class, 'save']);
 Route::delete('lists/{id}/delete', [listController::class, 'delete']);
 Route::put('lists/{id}/edit', [listController::class, 'edit']);
+
 
 //API's for items
 Route::get('items', [itemController::class, 'index']);
