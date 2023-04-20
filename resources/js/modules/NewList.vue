@@ -1,4 +1,5 @@
 <template>
+    <!-- This is the newlist module -->
     <div
         class="wrapper container position-fixed d-flex justify-content-center align-items-center"
     >
@@ -7,6 +8,8 @@
                 class="w-100 d-flex justify-content-between align-items-end border-bottom-secondary"
             >
                 <h1 class="text-secondary m-0 p-0">ADD NEW LIST</h1>
+
+                <!-- Triggers the toggle method -->
                 <button
                     class="btn btn-outline-danger"
                     @click="toggleVisibility"
@@ -20,12 +23,15 @@
                     class="form-group mb-3 d-flex flex-column justify-content-start"
                 >
                     <div class="w-100 d-flex justify-content-between">
+                        <!-- Binding the input data to a variable that I can work with using v-model -->
                         <input
                             type="text"
                             v-model="title"
                             class="form-control w-75"
                             placeholder="List title:"
                         />
+
+                        <!-- Mthd that's called when submit -->
                         <button class="btn btn-primary" @click="handleSubmit">
                             ADD ITEM
                             <i class="fa-solid fa-paper-plane ps-3"></i>
@@ -43,14 +49,19 @@
 
 <script>
 import axios from "axios";
+//importing a notification library
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+
 export default {
+    //initialising app variables
     data() {
         return {
             title: "",
         };
     },
+
+    //initialising props
     props: {
         visibleProp: Boolean,
     },
@@ -59,7 +70,7 @@ export default {
             this.$emit("update:visibleMethod", !this.visibleProp);
         },
         handleSubmit() {
-            console.log(this.title);
+            //    Empty validation
             if (this.title === "") {
                 Toastify({
                     text: "Please enter a title for your list!  ",
@@ -73,7 +84,7 @@ export default {
                 }).showToast();
                 return;
             }
-
+            // handling API posting
             axios
                 .post("/api/lists", { title: this.title })
                 .then((response) => {
