@@ -5361,9 +5361,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! toastify-js */ "./node_modules/toastify-js/src/toastify.js");
-/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toastify_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var toastify_js_src_toastify_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! toastify-js/src/toastify.css */ "./node_modules/toastify-js/src/toastify.css");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! toastify-js */ "./node_modules/toastify-js/src/toastify.js");
+/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(toastify_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var toastify_js_src_toastify_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! toastify-js/src/toastify.css */ "./node_modules/toastify-js/src/toastify.css");
 //
 //
 //
@@ -5407,33 +5409,45 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      title: ""
+    };
+  },
   props: {
     visibleProp: Boolean
   },
   methods: {
     toggleVisibility: function toggleVisibility() {
       this.$emit("update:visibleMethod", !this.visibleProp);
-      console.log(visibleProp);
     },
     handleSubmit: function handleSubmit() {
-      toastify_js__WEBPACK_IMPORTED_MODULE_0___default()({
-        text: "This is a notification!",
-        duration: 2000,
-        newWindow: true,
-        close: true,
-        gravity: "top",
-        // bottom-right, bottom-left, top-right, top-left
-        position: "center",
-        // left, right, center
-        backgroundColor: "#5E565A",
-        stopOnFocus: true // Prevents dismissing of toast on hover
-      }).showToast();
+      console.log(this.title);
+      if (this.title === "") {
+        toastify_js__WEBPACK_IMPORTED_MODULE_1___default()({
+          text: "Please enter a title for your list!  ",
+          duration: 2000,
+          newWindow: true,
+          close: true,
+          gravity: "top",
+          // bottom-right, bottom-left, top-right, top-left
+          position: "center",
+          // left, right, center
+          backgroundColor: "#ffc107",
+          stopOnFocus: false // Prevents dismissing of toast on hover
+        }).showToast();
+        return;
+      }
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/lists", {
+        title: this.title
+      }).then(function (response) {
+        console.log(response);
+      })["catch"](console.error());
     }
   }
 });
@@ -29767,20 +29781,32 @@ var render = function () {
                   { staticClass: "w-100 d-flex justify-content-between" },
                   [
                     _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.title,
+                          expression: "title",
+                        },
+                      ],
                       staticClass: "form-control w-75",
                       attrs: { type: "text", placeholder: "List title:" },
+                      domProps: { value: _vm.title },
+                      on: {
+                        input: function ($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.title = $event.target.value
+                        },
+                      },
                     }),
                     _vm._v(" "),
                     _c(
                       "button",
                       {
                         staticClass: "btn btn-primary",
-                        on: {
-                          click: function ($event) {
-                            $event.preventDefault()
-                            return _vm.handleSubmit.apply(null, arguments)
-                          },
-                        },
+                        on: { click: _vm.handleSubmit },
                       },
                       [
                         _vm._v(

@@ -22,13 +22,11 @@
                     <div class="w-100 d-flex justify-content-between">
                         <input
                             type="text"
+                            v-model="title"
                             class="form-control w-75"
                             placeholder="List title:"
                         />
-                        <button
-                            class="btn btn-primary"
-                            @click.prevent="handleSubmit"
-                        >
+                        <button class="btn btn-primary" @click="handleSubmit">
                             ADD ITEM
                             <i class="fa-solid fa-paper-plane ps-3"></i>
                         </button>
@@ -44,28 +42,44 @@
 </template>
 
 <script>
+import axios from "axios";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 export default {
+    data() {
+        return {
+            title: "",
+        };
+    },
     props: {
         visibleProp: Boolean,
     },
     methods: {
         toggleVisibility() {
             this.$emit("update:visibleMethod", !this.visibleProp);
-            console.log(visibleProp);
         },
         handleSubmit() {
-            Toastify({
-                text: "This is a notification!",
-                duration: 2000,
-                newWindow: true,
-                close: true,
-                gravity: "top", // bottom-right, bottom-left, top-right, top-left
-                position: "center", // left, right, center
-                backgroundColor: "#5E565A",
-                stopOnFocus: true, // Prevents dismissing of toast on hover
-            }).showToast();
+            console.log(this.title);
+            if (this.title === "") {
+                Toastify({
+                    text: "Please enter a title for your list!  ",
+                    duration: 2000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // bottom-right, bottom-left, top-right, top-left
+                    position: "center", // left, right, center
+                    backgroundColor: "#ffc107",
+                    stopOnFocus: false, // Prevents dismissing of toast on hover
+                }).showToast();
+                return;
+            }
+
+            axios
+                .post("/api/lists", { title: this.title })
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch(console.error());
         },
     },
 };
