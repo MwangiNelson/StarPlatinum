@@ -1,7 +1,7 @@
 <template>
     <div class="w-100">
-        <div class="w-100" v-if="visible">
-            <NewList :visible="visible" />
+        <div class="w-100" v-if="visible" >
+            <NewList :visibleProp="visible" @update:visibleMethod="visible = $event"/>
         </div>
         <div class="w-100 my-4">
             <div class="header w-100 d-flex justify-content-between">
@@ -9,8 +9,12 @@
                     <h2>MY LISTS</h2>
                 </div>
                 <div class="w-25 d-flex justify-content-end">
-                    <button class="btn btn-primary" @click="visible = !visible">
-                        <i class="fa-solid fa-add"></i>
+                    <button
+                        class="btn btn-primary"
+                        @click="visible = !visible"
+                        
+                    >
+                        <i class="fa-solid fa-plus"></i>
                         NEW LIST
                     </button>
                 </div>
@@ -53,6 +57,11 @@ export default {
                 console.log(this.cardDetails);
             })
             .catch(console.error());
+    },
+    computed: {
+        toggleVisibility() {
+            return this.visible;
+        },
     },
 };
 </script>

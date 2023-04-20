@@ -7,6 +7,7 @@
 
 <script>
 import Landing from "../screens/Landing.vue";
+
 export default {
     components: {
         Landing,

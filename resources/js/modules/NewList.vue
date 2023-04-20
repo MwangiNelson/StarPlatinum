@@ -8,7 +8,9 @@
             >
                 <h1 class="text-secondary m-0 p-0">ADD NEW LIST</h1>
                 <button
-                    class="btn btn-outline-danger">
+                    class="btn btn-outline-danger"
+                    @click="toggleVisibility"
+                >
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -23,7 +25,10 @@
                             class="form-control w-75"
                             placeholder="List title:"
                         />
-                        <button class="btn btn-primary">
+                        <button
+                            class="btn btn-primary"
+                            @click.prevent="handleSubmit"
+                        >
                             ADD ITEM
                             <i class="fa-solid fa-paper-plane ps-3"></i>
                         </button>
@@ -39,8 +44,30 @@
 </template>
 
 <script>
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 export default {
-    
+    props: {
+        visibleProp: Boolean,
+    },
+    methods: {
+        toggleVisibility() {
+            this.$emit("update:visibleMethod", !this.visibleProp);
+            console.log(visibleProp);
+        },
+        handleSubmit() {
+            Toastify({
+                text: "This is a notification!",
+                duration: 2000,
+                newWindow: true,
+                close: true,
+                gravity: "top", // bottom-right, bottom-left, top-right, top-left
+                position: "center", // left, right, center
+                backgroundColor: "#5E565A",
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+            }).showToast();
+        },
+    },
 };
 </script>
 
