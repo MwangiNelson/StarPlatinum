@@ -1,4 +1,5 @@
 <template>
+    <!-- This is the view the user will see after clicking a list card -->
     <div
         class="container w-100 d-flex flex-column align-items-center justify-content-between my-4"
     >
@@ -8,6 +9,7 @@
                     class="breadcrumb d-flex justify-content-start align-items-center w-100 m-0"
                 >
                     <li class="breadcrumb-item active">
+                        <!-- A back route - goes back to the home page -->
                         <router-link to="/" class="link">
                             <button
                                 class="btn btn-light d-flex align-items-center"
@@ -20,36 +22,49 @@
                     <li
                         class="d-flex align-items-center breadcrumb-item active"
                     >
+                        <!-- Displays the list name -->
                         <h3 class="m-0 text-uppercase px-3">{{ listName }}</h3>
                     </li>
                 </ol>
             </div>
             <div class="w-25 d-flex justify-content-end">
-                <button class="btn btn-danger">
-                    <i class="fa-solid fa-trash"></i>
-                    DELETE LIST
+                <!-- This is the BIG RED button push at your own peril😂😂 -->
+                <!-- It deletes all the to-dos under this list -->
+                <button class="btn btn-danger" @click="clearList">
+                    <i class="fa-solid fa-trash pe-2"></i>
+                    CLEAR LIST
                 </button>
             </div>
         </div>
 
         <hr class="w-100" />
 
+        <!-- This is a conditional render, to utput different info when:loading,no data and when data is recieved -->
         <div class="w-100 d-flex" v-if="loaded">
             <span class="w-100 alert alert-secondary m-0 text-center">
                 {{ emptyReturn }}
             </span>
         </div>
+        <!-- If there are items in the list, they'll be displayed here -->
+        <!-- Using vue's iterating loader.... -->
         <div
             class="container w-100 d-flex flex-column"
             v-else
             v-for="item in todos"
             :key="item.id"
         >
+            <!-- To do item card -->
             <div
-                class="container w-100 d-flex align-items-center justify-content-between bg-primary rounded py-2 px-3 my-2"
+                :class="`container d-flex align-items-center justify-content-between ${
+                    item.is_completed ? 'bg-success' : 'bg-primary'
+                } rounded py-2 px-3 my-2`"
             >
                 <div class="w-50 d-flex align-items-center">
-                    <input type="checkbox" class="form-input" />
+                    <input
+                        type="checkbox"
+                        class="form-input"
+                        v-model="item.is_completed"
+                    />
                     <h4 class="m-0 px-3">{{ item.title }}</h4>
                 </div>
                 <div class="w-25 d-flex justify-content-end">
@@ -57,12 +72,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- This is the adding a new item module  -->
         <div class="container w-100 fixed-bottom mb-4">
             <div
                 class="container rounded bg-secondary w-100 d-flex justify-content-start py-3"
             >
                 <form class="w-100 d-flex align-items-center m-0 p-0 container">
                     <i class="fa-regular fa-circle white me-2"></i>
+
+                    <!-- Vue binding the newToDo varible to the input -->
                     <input
                         type="text"
                         class="form-control w-100"
@@ -92,9 +111,11 @@ export default {
             emptyReturn: "Fetching...",
             loaded: true,
             listName: "",
+            newTodo: "",
         };
     },
     methods: {
+        // makes the api call to get the to do list data
         getToDos() {
             axios
                 .get(`/api/todos/${this.$route.params.listId}`)
@@ -125,14 +146,26 @@ export default {
             }
             let toDoItem = {
                 title: this.newTodo,
-                note: "",
-                list_id: this.$route.params.listId,
+                note: "note",
                 is_completed: 0,
+                list_id: this.$route.params.listId,
             };
             axios
-                .post(`/api/items`, { data: toDoItem })
+                .post(`/api/items`, toDoItem)
                 .then((response) => {
                     notification(response.data.data, "#28a745");
+                    this.getToDos();
+                })
+                .catch((error) => {
+                    notification(error, "#dc3545");
+                });
+        },
+        clearList() {
+            axios
+                .delete(`/api/clear/${this.$route.params.listId}`)
+                .then((response) => {
+                    notification(response.data.data, "#28a745");
+                    this.todos = [];
                     this.getToDos();
                 })
                 .catch((error) => {

@@ -5485,10 +5485,12 @@ __webpack_require__.r(__webpack_exports__);
       todos: [],
       emptyReturn: "Fetching...",
       loaded: true,
-      listName: ""
+      listName: "",
+      newTodo: ""
     };
   },
   methods: {
+    // makes the api call to get the to do list data
     getToDos: function getToDos() {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/todos/".concat(this.$route.params.listId)).then(function (response) {
@@ -5516,15 +5518,23 @@ __webpack_require__.r(__webpack_exports__);
       }
       var toDoItem = {
         title: this.newTodo,
-        note: "",
-        list_id: this.$route.params.listId,
-        is_completed: 0
+        note: "note",
+        is_completed: 0,
+        list_id: this.$route.params.listId
       };
-      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/items", {
-        data: toDoItem
-      }).then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/items", toDoItem).then(function (response) {
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(response.data.data, "#28a745");
         _this3.getToDos();
+      })["catch"](function (error) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
+      });
+    },
+    clearList: function clearList() {
+      var _this4 = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/api/clear/".concat(this.$route.params.listId)).then(function (response) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(response.data.data, "#28a745");
+        _this4.todos = [];
+        _this4.getToDos();
       })["catch"](function (error) {
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
       });
@@ -5793,7 +5803,16 @@ var render = function render() {
     staticClass: "d-flex align-items-center breadcrumb-item active"
   }, [_c("h3", {
     staticClass: "m-0 text-uppercase px-3"
-  }, [_vm._v(_vm._s(_vm.listName))])])])]), _vm._v(" "), _vm._m(0)]), _vm._v(" "), _c("hr", {
+  }, [_vm._v(_vm._s(_vm.listName))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "w-25 d-flex justify-content-end"
+  }, [_c("button", {
+    staticClass: "btn btn-danger",
+    on: {
+      click: _vm.clearList
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-trash pe-2"
+  }), _vm._v("\n                CLEAR LIST\n            ")])])]), _vm._v(" "), _c("hr", {
     staticClass: "w-100"
   }), _vm._v(" "), _vm.loaded ? _c("div", {
     staticClass: "w-100 d-flex"
@@ -5804,17 +5823,44 @@ var render = function render() {
       key: item.id,
       staticClass: "container w-100 d-flex flex-column"
     }, [_c("div", {
-      staticClass: "container w-100 d-flex align-items-center justify-content-between bg-primary rounded py-2 px-3 my-2"
+      "class": "container d-flex align-items-center justify-content-between ".concat(item.is_completed ? "bg-success" : "bg-primary", " rounded py-2 px-3 my-2")
     }, [_c("div", {
       staticClass: "w-50 d-flex align-items-center"
     }, [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: item.is_completed,
+        expression: "item.is_completed"
+      }],
       staticClass: "form-input",
       attrs: {
         type: "checkbox"
+      },
+      domProps: {
+        checked: Array.isArray(item.is_completed) ? _vm._i(item.is_completed, null) > -1 : item.is_completed
+      },
+      on: {
+        change: function change($event) {
+          var $$a = item.is_completed,
+            $$el = $event.target,
+            $$c = $$el.checked ? true : false;
+          if (Array.isArray($$a)) {
+            var $$v = null,
+              $$i = _vm._i($$a, $$v);
+            if ($$el.checked) {
+              $$i < 0 && _vm.$set(item, "is_completed", $$a.concat([$$v]));
+            } else {
+              $$i > -1 && _vm.$set(item, "is_completed", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+            }
+          } else {
+            _vm.$set(item, "is_completed", $$c);
+          }
+        }
       }
     }), _vm._v(" "), _c("h4", {
       staticClass: "m-0 px-3"
-    }, [_vm._v(_vm._s(item.title))])]), _vm._v(" "), _vm._m(1, true)])]);
+    }, [_vm._v(_vm._s(item.title))])]), _vm._v(" "), _vm._m(0, true)])]);
   }), _vm._v(" "), _c("div", {
     staticClass: "container w-100 fixed-bottom mb-4"
   }, [_c("div", {
@@ -5857,16 +5903,6 @@ var render = function render() {
   })])])])])], 2);
 };
 var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "w-25 d-flex justify-content-end"
-  }, [_c("button", {
-    staticClass: "btn btn-danger"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-trash"
-  }), _vm._v("\n                DELETE LIST\n            ")])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {

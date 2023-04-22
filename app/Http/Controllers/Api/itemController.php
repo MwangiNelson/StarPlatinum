@@ -63,7 +63,7 @@ class itemController extends Controller
                 'title' => $data->title,
                 'note' => $data->note,
                 'is_completed' => $data->is_completed,
-                'list_id' => $data->list_id
+                'list_id' => intval($data->list_id)
 
             ]);
 
@@ -141,6 +141,17 @@ class itemController extends Controller
             }
         } else {
             return $this->apiDeliver(404, "No such record was found");
+        }
+    }
+
+    public function clearList($id)
+    {
+        $clearListRes = ItemModel::where('list_id', '=', $id)->delete();
+
+        if ($clearListRes) {
+            return $this->apiDeliver(200, "Records deleted successfully");
+        } else {
+            return $this->apiDeliver(404, "Record could not be updated");
         }
     }
 }
