@@ -1,15 +1,17 @@
 <template>
     <div class="w-100">
-
         <!--   The v-if method is an inbuilt vue method for conditional renders -->
         <!-- It is using the 'visible' boolean variable to show the Add NewList module -->
-        <div class="w-100" v-if="visible" >
-
+        <div class="w-100" v-if="visible">
             <!-- The new list ,module is taking a prop that's the 'visible' variable mentioned above -->
             <!-- This is to enable toggle view syntax using it's button -->
             <!-- The parameters for the toggle view mathod are also taken -->
             <!-- More info on it's vue file -->
-            <NewList :visibleProp="visible" @update:visibleMethod="visible = $event"/>
+            <NewList
+                :visibleProp="visible"
+                @update:visibleMethod="visible = $event"
+                @listUpdated="getLists"
+            />
         </div>
         <div class="w-100 my-4">
             <div class="header w-100 d-flex justify-content-between">
@@ -17,13 +19,8 @@
                     <h2>MY LISTS</h2>
                 </div>
                 <div class="w-25 d-flex justify-content-end">
-
                     <!-- This button toggles the 'visible' variable to enable view of the new item module-->
-                    <button
-                        class="btn btn-primary"
-                        @click="visible = !visible"
-                        
-                    >
+                    <button class="btn btn-primary" @click="visible = !visible">
                         <i class="fa-solid fa-plus"></i>
                         NEW LIST
                     </button>
@@ -31,7 +28,6 @@
             </div>
             <hr />
             <div class="lists w-100">
-
                 <!-- This is a list display for all the lists categories -->
                 <!-- It iterates through the data using the v-for method
                      that has been parsed in the cardDetails variable by the API call below 
@@ -42,9 +38,14 @@
                     v-for="card in cardDetails"
                     :key="cardDetails.id"
                 >
-                <!-- The prop card details are passd as prop values -->
-                <!-- More info on Cards.vue -->
-                    <Cards :title="card.title" :date="card.created_at" />
+                    <!-- The prop card details are passd as prop values -->
+                    <!-- More info on Cards.vue -->
+                    <Cards
+                        :title="card.title"
+                        :date="card.created_at"
+                        :listId="card.id"
+                        @listDeleted="getLists"
+                    />
                 </div>
             </div>
         </div>
@@ -52,7 +53,6 @@
 </template>
 
 <script>
-
 // Importing the card component
 import Cards from "../components/Cards.vue";
 
@@ -61,7 +61,6 @@ import NewList from "../modules/NewList.vue";
 
 // Import axios for API calls handling
 import axios from "axios";
-
 export default {
     name: "Lists",
     // These are the imported components for render
@@ -69,7 +68,16 @@ export default {
         Cards,
         NewList,
     },
-
+    methods: {
+        getLists() {
+            axios
+                .get("/api/lists")
+                .then((response) => {
+                    this.cardDetails = response.data.data;
+                })
+                .catch(console.error());
+        },
+    },
     // Initialising variable data that's being computed an all 😂😂
     data() {
         return {
@@ -80,19 +88,11 @@ export default {
 
     // making API calls
     mounted() {
-
         // getting and storing the cardDetails data in the cardDetails variable (psst.it's an array of objects)
         // It comes with error handling
-        axios
-            .get("/api/lists")
-            .then((response) => {
-                this.cardDetails = response.data.data;
-                console.log(this.cardDetails);
-            })
-            .catch(console.error());
+        this.getLists();
     },
 
-    
     computed: {
         toggleVisibility() {
             return this.visible;
