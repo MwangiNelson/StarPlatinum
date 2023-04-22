@@ -98,15 +98,9 @@ class listController extends Controller
         //The db is queried
         //if the data is found, it's stored in the selected var that is true in boolean
         $selected = ListModel::find($id);
-        if ($selected) {
 
-            //the selected data is reyurned as data in the API json
-            return $this->apiDeliver(200, $selected);
-        } else {
-
-            //else an error message is sent back 
-            return $this->apiDeliver(404, "No such record was found");
-        }
+        //the selected data is reyurned as data in the API json
+        return $this->apiDeliver(200, $selected);
     }
 
 
@@ -147,6 +141,8 @@ class listController extends Controller
     public function getItemsFromList($id)
     {
         $data = ItemModel::where('list_id', '=', $id)->get();
+
+
         return $this->apiDeliver(200, $data);
     }
 }

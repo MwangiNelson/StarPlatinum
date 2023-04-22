@@ -5475,24 +5475,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _notification__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification */ "./resources/js/notification.js");
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "itemView",
   data: function data() {
     return {
       todos: [],
-      emptyReturn: "",
+      emptyReturn: "Fetching...",
       loaded: true,
       listName: ""
     };
   },
-  props: {
-    listId: Number
-  },
   methods: {
-    getToDos: function getToDos(id) {
+    getToDos: function getToDos() {
       var _this = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/todos/".concat(id)).then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/todos/".concat(this.$route.params.listId)).then(function (response) {
         var listData = response.data.data;
         if (listData.length === 0) {
           _this.emptyReturn = "This list has no items yet";
@@ -5502,17 +5501,38 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](console.error());
     },
-    getListName: function getListName(id) {
+    getListName: function getListName() {
       var _this2 = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/lists/".concat(id)).then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/lists/".concat(this.$route.params.listId)).then(function (response) {
         console.log(response.data.data.title);
         _this2.listName = response.data.data.title;
       })["catch"](console.error());
+    },
+    handleSubmit: function handleSubmit() {
+      var _this3 = this;
+      if (this.newTodo.length === 0) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])("Please enter a title for your to do!", "#ffc107");
+        return;
+      }
+      var toDoItem = {
+        title: this.newTodo,
+        note: "",
+        list_id: this.$route.params.listId,
+        is_completed: 0
+      };
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/items", {
+        data: toDoItem
+      }).then(function (response) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(response.data.data, "#28a745");
+        _this3.getToDos();
+      })["catch"](function (error) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
+      });
     }
   },
   mounted: function mounted() {
-    this.getToDos(this.listId);
-    this.getListName(this.listId);
+    this.getToDos();
+    this.getListName();
   }
 });
 
@@ -5782,9 +5802,59 @@ var render = function render() {
   }, [_vm._v("\n            " + _vm._s(_vm.emptyReturn) + "\n        ")])]) : _vm._l(_vm.todos, function (item) {
     return _c("div", {
       key: item.id,
-      staticClass: "container"
-    }, [_c("p", [_vm._v(_vm._s(item))])]);
-  })], 2);
+      staticClass: "container w-100 d-flex flex-column"
+    }, [_c("div", {
+      staticClass: "container w-100 d-flex align-items-center justify-content-between bg-primary rounded py-2 px-3 my-2"
+    }, [_c("div", {
+      staticClass: "w-50 d-flex align-items-center"
+    }, [_c("input", {
+      staticClass: "form-input",
+      attrs: {
+        type: "checkbox"
+      }
+    }), _vm._v(" "), _c("h4", {
+      staticClass: "m-0 px-3"
+    }, [_vm._v(_vm._s(item.title))])]), _vm._v(" "), _vm._m(1, true)])]);
+  }), _vm._v(" "), _c("div", {
+    staticClass: "container w-100 fixed-bottom mb-4"
+  }, [_c("div", {
+    staticClass: "container rounded bg-secondary w-100 d-flex justify-content-start py-3"
+  }, [_c("form", {
+    staticClass: "w-100 d-flex align-items-center m-0 p-0 container"
+  }, [_c("i", {
+    staticClass: "fa-regular fa-circle white me-2"
+  }), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.newTodo,
+      expression: "newTodo"
+    }],
+    staticClass: "form-control w-100",
+    attrs: {
+      type: "text",
+      placeholder: "Add new to do"
+    },
+    domProps: {
+      value: _vm.newTodo
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.newTodo = $event.target.value;
+      }
+    }
+  }), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-dark ms-2",
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        return _vm.handleSubmit.apply(null, arguments);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-add"
+  })])])])])], 2);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -5796,6 +5866,16 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fa-solid fa-trash"
   }), _vm._v("\n                DELETE LIST\n            ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "w-25 d-flex justify-content-end"
+  }, [_c("button", {
+    staticClass: "btn btn-text"
+  }, [_c("h2", {
+    staticClass: "m-0"
+  }, [_vm._v("⋮")])])]);
 }];
 render._withStripped = true;
 
@@ -5955,6 +6035,40 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /***/ }),
 
+/***/ "./resources/js/notification.js":
+/*!**************************************!*\
+  !*** ./resources/js/notification.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! toastify-js */ "./node_modules/toastify-js/src/toastify.js");
+/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toastify_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var toastify_js_src_toastify_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! toastify-js/src/toastify.css */ "./node_modules/toastify-js/src/toastify.css");
+
+
+function notification(message, color) {
+  return toastify_js__WEBPACK_IMPORTED_MODULE_0___default()({
+    text: message,
+    duration: 2500,
+    newWindow: true,
+    close: true,
+    gravity: "top",
+    // bottom-right, bottom-left, top-right, top-left
+    position: "center",
+    // left, right, center
+    backgroundColor: color,
+    stopOnFocus: true // Prevents dismissing of toast on hover
+  }).showToast();
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (notification);
+
+/***/ }),
+
 /***/ "./resources/js/routes.js":
 /*!********************************!*\
   !*** ./resources/js/routes.js ***!
@@ -5975,7 +6089,7 @@ var routes = [{
   name: 'home',
   component: _screens_Landing_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
 }, {
-  path: '/todos/:id',
+  path: '/todos/:listId',
   name: 'todos',
   component: _screens_ItemView_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
 }];
@@ -11278,7 +11392,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".link[data-v-b2dac704] {\n  text-decoration: none;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".link[data-v-b2dac704] {\n  text-decoration: none;\n}\n.white[data-v-b2dac704] {\n  color: white;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

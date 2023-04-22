@@ -8,7 +8,7 @@ const routes = [
         component: Landing
     },
     {
-        path: '/todos/:id',
+        path: '/todos/:listId',
         name: 'todos',
         component: ItemView
     }

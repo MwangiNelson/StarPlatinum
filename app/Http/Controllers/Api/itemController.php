@@ -23,13 +23,11 @@ class itemController extends Controller
     //I have bundled their respective error messages when not met
     public $rules = [
         'title' => 'required|string|max:150',
-        'note' => 'string|max:350'
     ];
     public $customMessages = [
         'required' => 'Please enter a title',
         'string' => 'Please use alphabet letters',
         'title.max' => 'Title should have a maximum of 150 characters',
-        'note.max' => 'Note should have a maximum of 350 characters',
     ];
 
 
