@@ -75,7 +75,7 @@ class listController extends Controller
             }
         }
     }
-
+ 
     //This method deletes data using the id passed as an arg
     public function delete($id)
     {
@@ -147,11 +147,11 @@ class listController extends Controller
         }
     }
 
+
+    //this method gets all to do items that share the same list category
     public function getItemsFromList($id)
     {
         $data = ItemModel::where('list_id', '=', $id)->get();
-
-
         return $this->apiDeliver(200, $data);
     }
 }

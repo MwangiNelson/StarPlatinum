@@ -1,5 +1,6 @@
 <template>
     <!-- This is the newlist module -->
+    <!-- When a user wants to add a new list, this is displayed -->
     <div
         class="wrapper container position-fixed d-flex justify-content-center align-items-center"
     >

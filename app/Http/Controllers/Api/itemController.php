@@ -146,8 +146,10 @@ class itemController extends Controller
         }
     }
 
+    //This method erases all to do items that share the same list_id
     public function clearList($id)
     {
+        //I am using laravel's eloquent model to handle the delete operation
         $clearListRes = ItemModel::where('list_id', '=', $id)->delete();
 
         if ($clearListRes) {

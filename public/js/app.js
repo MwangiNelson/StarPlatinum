@@ -5330,8 +5330,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _notification__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification */ "./resources/js/notification.js");
+// API library
 
-//notificaation library
+
+//notification library
 
 
 //exports
@@ -5341,6 +5343,7 @@ __webpack_require__.r(__webpack_exports__);
       itemCount: ""
     };
   },
+  // These are the variables that are to be initialised in the parent component
   props: {
     title: String,
     date: String,
@@ -5364,15 +5367,19 @@ __webpack_require__.r(__webpack_exports__);
       var match = dateProp.match(regex);
       return match[0];
     },
+    // Routes the user to the todos view component
     showToDo: function showToDo(listId) {
       this.$router.push("/todos/" + listId);
     },
+    // Hmmm,I'm still working on this
     editPrompt: function editPrompt() {
       alert("Sorry,still working on this");
     },
+    // This method is just for calculating the number of to do items in the list via API call
     getItemsCount: function getItemsCount() {
       var _this2 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/todos/".concat(this.listId)).then(function (res) {
+        // I am just getting the number of items returned by the API because it's an array of objects
         _this2.itemCount = res.data.data.length;
       })["catch"](function (err) {
         return console.error();
@@ -5380,6 +5387,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
+    // This is to call the getItems count method on component render
     this.getItemsCount();
   }
 });
@@ -5512,6 +5520,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](console.error());
     },
+    // gets the name of the list that has been selected for rendering
     getListName: function getListName() {
       var _this2 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/lists/".concat(this.$route.params.listId)).then(function (response) {
@@ -5519,6 +5528,7 @@ __webpack_require__.r(__webpack_exports__);
         _this2.listName = response.data.data.title;
       })["catch"](console.error());
     },
+    // Submits a new task to be saved with empty validation
     handleSubmit: function handleSubmit() {
       var _this3 = this;
       if (this.newTodo.length === 0) {
@@ -5538,6 +5548,7 @@ __webpack_require__.r(__webpack_exports__);
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
       });
     },
+    // deletes all tasks in the list
     clearList: function clearList() {
       var _this4 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/api/clear/".concat(this.$route.params.listId)).then(function (response) {
@@ -5548,6 +5559,7 @@ __webpack_require__.r(__webpack_exports__);
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
       });
     },
+    // Opens the side panel appending the selected item's data
     openPanel: function openPanel(id) {
       this.selected_item = true;
       this.edit_item = this.todos.find(function (item) {
@@ -5555,6 +5567,7 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.noteText = this.edit_item.note;
     },
+    // Updates the edited item
     updateToDo: function updateToDo() {
       var _this5 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().put("/api/items/edit/".concat(this.edit_item.id), this.edit_item).then(function (res) {
@@ -5564,6 +5577,7 @@ __webpack_require__.r(__webpack_exports__);
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
       });
     },
+    // Deletes the selected to do item
     deleteToDo: function deleteToDo() {
       var _this6 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/api/items/delete/".concat(this.edit_item.id)).then(function (res) {
@@ -5576,6 +5590,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   },
+  // Calling on load functions
   mounted: function mounted() {
     this.getToDos();
     this.getListName();
@@ -5685,7 +5700,7 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "list-card w-100",
+    staticClass: "list-card p-3 d-flex flex-column rounded bg-dark w-100",
     on: {
       click: function click($event) {
         $event.stopPropagation();
@@ -11550,7 +11565,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".list-card[data-v-767212f0] {\n  display: flex;\n  flex-direction: column;\n  padding: 1em;\n  border-radius: 5px;\n  background-color: #333;\n  color: white !important;\n  min-height: 15vh;\n}\n.title h2[data-v-767212f0] {\n  text-transform: capitalize;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".list-card[data-v-767212f0] {\n  color: white !important;\n  min-height: 15vh;\n}\n.title h2[data-v-767212f0] {\n  text-transform: capitalize;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
