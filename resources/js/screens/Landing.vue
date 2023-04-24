@@ -43,6 +43,7 @@
                     <Cards
                         :title="card.title"
                         :date="card.created_at"
+                        :date_update="card.updated_at"
                         :listId="card.id"
                         @listDeleted="getLists"
                     />

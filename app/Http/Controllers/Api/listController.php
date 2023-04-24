@@ -84,6 +84,15 @@ class listController extends Controller
         if ($selected) {
             //then it's deleted returning a 200 OK response
             $selected->delete();
+
+            $itemController = new itemController;
+            $itemsCleared = $itemController->clearList($id);
+            if ($itemsCleared) {
+                return $this->apiDeliver(200, "Item deleted successfully");
+            } else {
+                //else an error response is returned
+                return $this->apiDeliver(404, "An error occured");
+            }
             return $this->apiDeliver(200, "Item deleted successfully");
         } else {
 

@@ -130,6 +130,8 @@ class itemController extends Controller
                 //else it updates the data in the db
                 $new_list = $selected->update([
                     'title' => $request->title,
+                    'note' => $request->note,
+                    'is_completed' => $request->is_completed
                 ]);
 
                 //if uodate was successful,return an OK message or an ERROR message otherwise

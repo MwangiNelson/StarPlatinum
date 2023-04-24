@@ -5329,38 +5329,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! toastify-js */ "./node_modules/toastify-js/src/toastify.js");
-/* harmony import */ var toastify_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(toastify_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var toastify_js_src_toastify_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! toastify-js/src/toastify.css */ "./node_modules/toastify-js/src/toastify.css");
+/* harmony import */ var _notification__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification */ "./resources/js/notification.js");
 
 //notificaation library
 
 
-
 //exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      itemCount: ""
+    };
+  },
   props: {
     title: String,
     date: String,
-    listId: Number
+    listId: Number,
+    date_update: String
   },
   methods: {
     //delete List item API call method triggered by the button in the card above
     deleteList: function deleteList() {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/api/lists/".concat(this.listId, "/delete")).then(function (response) {
-        toastify_js__WEBPACK_IMPORTED_MODULE_1___default()({
-          text: "List deletd successfully!  ",
-          duration: 2500,
-          newWindow: true,
-          close: true,
-          gravity: "top",
-          // bottom-right, bottom-left, top-right, top-left
-          position: "center",
-          // left, right, center
-          backgroundColor: "#dc3545",
-          stopOnFocus: true // Prevents dismissing of toast on hover
-        }).showToast();
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])("List deletd successfully!  ", "#dc3545");
         _this.$emit("listDeleted");
       })["catch"](function (error) {
         return console.log(error);
@@ -5374,7 +5366,21 @@ __webpack_require__.r(__webpack_exports__);
     },
     showToDo: function showToDo(listId) {
       this.$router.push("/todos/" + listId);
+    },
+    editPrompt: function editPrompt() {
+      alert("Sorry,still working on this");
+    },
+    getItemsCount: function getItemsCount() {
+      var _this2 = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/todos/".concat(this.listId)).then(function (res) {
+        _this2.itemCount = res.data.data.length;
+      })["catch"](function (err) {
+        return console.error();
+      });
     }
+  },
+  mounted: function mounted() {
+    this.getItemsCount();
   }
 });
 
@@ -5486,7 +5492,10 @@ __webpack_require__.r(__webpack_exports__);
       emptyReturn: "Fetching...",
       loaded: true,
       listName: "",
-      newTodo: ""
+      newTodo: "",
+      selected_item: false,
+      edit_item: [],
+      prompted: false
     };
   },
   methods: {
@@ -5535,6 +5544,33 @@ __webpack_require__.r(__webpack_exports__);
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(response.data.data, "#28a745");
         _this4.todos = [];
         _this4.getToDos();
+      })["catch"](function (error) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
+      });
+    },
+    openPanel: function openPanel(id) {
+      this.selected_item = true;
+      this.edit_item = this.todos.find(function (item) {
+        return item.id === id;
+      });
+      this.noteText = this.edit_item.note;
+    },
+    updateToDo: function updateToDo() {
+      var _this5 = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().put("/api/items/edit/".concat(this.edit_item.id), this.edit_item).then(function (res) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(res.data.data, "#28a745");
+        _this5.getToDos();
+      })["catch"](function (error) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
+      });
+    },
+    deleteToDo: function deleteToDo() {
+      var _this6 = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/api/items/delete/".concat(this.edit_item.id)).then(function (res) {
+        (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(res.data.data, "#28a745");
+        _this6.selected_item = false;
+        _this6.prompted = false;
+        _this6.getToDos();
       })["catch"](function (error) {
         (0,_notification__WEBPACK_IMPORTED_MODULE_1__["default"])(error, "#dc3545");
       });
@@ -5652,35 +5688,43 @@ var render = function render() {
     staticClass: "list-card w-100",
     on: {
       click: function click($event) {
+        $event.stopPropagation();
         return _vm.showToDo(_vm.listId);
       }
     }
   }, [_c("div", {
     staticClass: "title d-flex justify-content-between"
-  }, [_c("h2", [_vm._v(_vm._s(_vm.title))]), _vm._v(" "), _vm._m(0)]), _vm._v(" "), _c("p", [_vm._v("40 items")]), _vm._v(" "), _c("div", {
+  }, [_c("h2", [_vm._v(_vm._s(_vm.title))]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-outline-secondary",
+    on: {
+      click: function click($event) {
+        $event.stopPropagation();
+        return _vm.editPrompt.apply(null, arguments);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-pen"
+  })])]), _vm._v(" "), _c("p", [_vm._v(_vm._s(_vm.itemCount) + " items")]), _vm._v(" "), _c("div", {
     staticClass: "w-100 d-flex justify-content-between align-items-end"
   }, [_c("div", {
-    staticClass: "w-75 d-flex align-items-end"
+    staticClass: "w-75 d-flex align-items-start flex-column"
   }, [_c("p", {
     staticClass: "m-0"
-  }, [_vm._v("Created on : " + _vm._s(_vm.getDate(_vm.date)))])]), _vm._v(" "), _c("button", {
+  }, [_vm._v("Created on : " + _vm._s(_vm.getDate(_vm.date)))]), _vm._v(" "), _c("p", {
+    staticClass: "my-1"
+  }, [_vm._v("Updated on: " + _vm._s(_vm.getDate(_vm.date_update)))])]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-outline-danger",
     on: {
-      click: _vm.deleteList
+      click: function click($event) {
+        $event.stopPropagation();
+        return _vm.deleteList.apply(null, arguments);
+      }
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-trash"
   })])])]);
 };
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-outline-secondary"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-pen"
-  })]);
-}];
+var staticRenderFns = [];
 render._withStripped = true;
 
 
@@ -5814,16 +5858,25 @@ var render = function render() {
     staticClass: "fa-solid fa-trash pe-2"
   }), _vm._v("\n                CLEAR LIST\n            ")])])]), _vm._v(" "), _c("hr", {
     staticClass: "w-100"
-  }), _vm._v(" "), _vm.loaded ? _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "content-area w-100 d-flex justify-content-start align-items-start position-relative"
+  }, [_vm.loaded ? _c("div", {
     staticClass: "w-100 d-flex"
   }, [_c("span", {
     staticClass: "w-100 alert alert-secondary m-0 text-center"
-  }, [_vm._v("\n            " + _vm._s(_vm.emptyReturn) + "\n        ")])]) : _vm._l(_vm.todos, function (item) {
+  }, [_vm._v("\n                " + _vm._s(_vm.emptyReturn) + "\n            ")])]) : _c("div", {
+    "class": "".concat(_vm.selected_item ? "w-75" : "w-100", " d-flex flex-column")
+  }, _vm._l(_vm.todos, function (item) {
     return _c("div", {
       key: item.id,
       staticClass: "container w-100 d-flex flex-column"
     }, [_c("div", {
-      "class": "container d-flex align-items-center justify-content-between ".concat(item.is_completed ? "bg-success" : "bg-primary", " rounded py-2 px-3 my-2")
+      "class": "container d-flex align-items-center justify-content-between ".concat(item.is_completed ? "bg-success" : "bg-primary", " rounded py-2 px-3 my-2"),
+      on: {
+        click: function click($event) {
+          return _vm.openPanel(item.id);
+        }
+      }
     }, [_c("div", {
       staticClass: "w-50 d-flex align-items-center"
     }, [_c("input", {
@@ -5860,8 +5913,134 @@ var render = function render() {
       }
     }), _vm._v(" "), _c("h4", {
       staticClass: "m-0 px-3"
-    }, [_vm._v(_vm._s(item.title))])]), _vm._v(" "), _vm._m(0, true)])]);
+    }, [_vm._v(_vm._s(item.title))])]), _vm._v(" "), _c("div", {
+      staticClass: "w-25 d-flex justify-content-end"
+    }, [_c("button", {
+      staticClass: "btn btn-text",
+      on: {
+        click: function click($event) {
+          return _vm.openPanel(item.id);
+        }
+      }
+    }, [_c("h2", {
+      staticClass: "m-0"
+    }, [_vm._v("⋮")])])])])]);
+  }), 0), _vm._v(" "), _vm.selected_item ? _c("div", {
+    staticClass: "w-25 d-flex flex-column justify-content-start bg-dark rounded m-2 p-2 position-absolute top-0 end-0"
+  }, [_vm.prompted ? _c("div", {
+    staticClass: "position-absolute top-0 w-100 m-0 p-0 h-100 rounded blur d-flex justify-content-center align-items-center"
+  }, [_c("div", {
+    staticClass: "d-flex bg-dark shadow-lg container rounded flex-column w-75 justify-content-center align-items-center"
+  }, [_c("p", {
+    staticClass: "m-0 fs-4 text-center text-light"
+  }, [_vm._v("\n                        Do you want to delete "), _c("br"), _vm._v("\n                        ' " + _vm._s(_vm.edit_item.title) + " '?\n                    ")]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex my-2 justify-content-center"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-primary mx-2",
+    on: {
+      click: function click($event) {
+        _vm.prompted = !_vm.prompted;
+      }
+    }
+  }, [_vm._v("\n                            Cancel\n                        ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-outline-danger mx-2",
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        return _vm.deleteToDo.apply(null, arguments);
+      }
+    }
+  }, [_vm._v("\n                            Delete\n                        ")])])])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "w-100 rounded bg-dark d-flex justify-content-between align-items-center shadow-lg"
+  }, [_c("div", {
+    staticClass: "w-100 d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-pen mx-3 text-light"
+  }), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.edit_item.title,
+      expression: "edit_item.title"
+    }],
+    staticClass: "form-control fs-3 bg-dark border p-0 m-0 border-dark text-light shadow-none",
+    attrs: {
+      type: "text",
+      id: ""
+    },
+    domProps: {
+      value: _vm.edit_item.title
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.edit_item, "title", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-dark",
+    on: {
+      click: function click($event) {
+        _vm.selected_item = !_vm.selected_item;
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-xmark"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "w-50 my-2"
+  }, [_c("span", {
+    "class": "w-100 rounded p-1 ".concat(_vm.edit_item.is_completed ? "bg-success text-light" : "bg-primary")
+  }, [_vm._v("\n                    " + _vm._s(_vm.edit_item.is_completed ? "Completed" : "Task not yet done") + "\n                ")])]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 bg-light rounded my-2 shadow-lg d-flex flex-column p-2"
+  }, [_c("h4", {
+    staticClass: "text-dark"
+  }, [_vm._v("Item note")]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex"
+  }, [_c("form", {
+    staticClass: "w-100 m-0"
+  }, [_c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.edit_item.note,
+      expression: "edit_item.note"
+    }],
+    staticClass: "w-100 form-control mb-2",
+    attrs: {
+      rows: "4"
+    },
+    domProps: {
+      value: _vm.edit_item.note
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.edit_item, "note", $event.target.value);
+      }
+    }
   }), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex"
+  }, [_c("button", {
+    staticClass: "btn btn-warning w-50 m-2",
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        return _vm.updateToDo.apply(null, arguments);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-pen pe-2"
+  }), _vm._v("\n                                Update Item\n                            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-danger w-50 m-2",
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.prompted = !_vm.prompted;
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-trash"
+  }), _vm._v("\n                                Delete Item\n                            ")])])])])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "container w-100 fixed-bottom mb-4"
   }, [_c("div", {
     staticClass: "container rounded bg-secondary w-100 d-flex justify-content-start py-3"
@@ -5900,19 +6079,9 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-add"
-  })])])])])], 2);
+  })])])])])]);
 };
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "w-25 d-flex justify-content-end"
-  }, [_c("button", {
-    staticClass: "btn btn-text"
-  }, [_c("h2", {
-    staticClass: "m-0"
-  }, [_vm._v("⋮")])])]);
-}];
+var staticRenderFns = [];
 render._withStripped = true;
 
 
@@ -5972,6 +6141,7 @@ var render = function render() {
       attrs: {
         title: card.title,
         date: card.created_at,
+        date_update: card.updated_at,
         listId: card.id
       },
       on: {
@@ -11428,7 +11598,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".link[data-v-b2dac704] {\n  text-decoration: none;\n}\n.white[data-v-b2dac704] {\n  color: white;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".link[data-v-b2dac704] {\n  text-decoration: none;\n}\n.white[data-v-b2dac704] {\n  color: white;\n}\n.blur[data-v-b2dac704] {\n  -webkit-backdrop-filter: blur(3px);\n          backdrop-filter: blur(3px);\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

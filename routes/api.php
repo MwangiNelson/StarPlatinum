@@ -34,6 +34,6 @@ Route::put('lists/{id}/edit', [listController::class, 'edit']);
 Route::get('items', [itemController::class, 'index']);
 Route::get('items/{id}', [itemController::class, 'select']);
 Route::post('items', [itemController::class, 'save']);
-Route::delete('items/{id}/delete', [itemController::class, 'delete']);
-Route::put('items/{id}/edit', [itemController::class, 'edit']);
+Route::delete('items/delete/{id}', [itemController::class, 'delete']);
+Route::put('items/edit/{id}', [itemController::class, 'edit']);
 Route::delete('clear/{id}', [itemController::class, 'clearList']);

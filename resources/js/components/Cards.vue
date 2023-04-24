@@ -1,17 +1,18 @@
 <template>
-    <div class="list-card w-100" @click="showToDo(listId)">
+    <div class="list-card w-100" @click.stop="showToDo(listId)">
         <div class="title d-flex justify-content-between">
             <h2>{{ title }}</h2>
-            <button class="btn btn-outline-secondary">
+            <button class="btn btn-outline-secondary" @click.stop="editPrompt">
                 <i class="fa-solid fa-pen"></i>
             </button>
         </div>
-        <p>40 items</p>
+        <p>{{ itemCount }} items</p>
         <div class="w-100 d-flex justify-content-between align-items-end">
-            <div class="w-75 d-flex align-items-end">
+            <div class="w-75 d-flex align-items-start flex-column">
                 <p class="m-0">Created on : {{ getDate(date) }}</p>
+                <p class="my-1">Updated on: {{ getDate(date_update) }}</p>
             </div>
-            <button class="btn btn-outline-danger" @click="deleteList">
+            <button class="btn btn-outline-danger" @click.stop="deleteList">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
@@ -21,15 +22,20 @@
 <script lang="ts">
 import axios from "axios";
 //notificaation library
-import Toastify from "toastify-js";
-import "toastify-js/src/toastify.css";
+import notification from "../notification";
 
 //exports
 export default {
+    data() {
+        return {
+            itemCount: "",
+        };
+    },
     props: {
         title: String,
         date: String,
         listId: Number,
+        date_update: String,
     },
     methods: {
         //delete List item API call method triggered by the button in the card above
@@ -37,16 +43,7 @@ export default {
             axios
                 .delete(`/api/lists/${this.listId}/delete`)
                 .then((response) => {
-                    Toastify({
-                        text: "List deletd successfully!  ",
-                        duration: 2500,
-                        newWindow: true,
-                        close: true,
-                        gravity: "top", // bottom-right, bottom-left, top-right, top-left
-                        position: "center", // left, right, center
-                        backgroundColor: "#dc3545",
-                        stopOnFocus: true, // Prevents dismissing of toast on hover
-                    }).showToast();
+                    notification("List deletd successfully!  ", "#dc3545");
                     this.$emit("listDeleted");
                 })
                 .catch((error) => console.log(error));
@@ -62,6 +59,20 @@ export default {
         showToDo(listId) {
             this.$router.push("/todos/" + listId);
         },
+        editPrompt() {
+            alert("Sorry,still working on this");
+        },
+        getItemsCount() {
+            axios
+                .get(`/api/todos/${this.listId}`)
+                .then((res) => {
+                    this.itemCount = res.data.data.length;
+                })
+                .catch((err) => console.error());
+        },
+    },
+    mounted() {
+        this.getItemsCount();
     },
 };
 </script>

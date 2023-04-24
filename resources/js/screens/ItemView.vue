@@ -38,41 +38,154 @@
         </div>
 
         <hr class="w-100" />
-
-        <!-- This is a conditional render, to utput different info when:loading,no data and when data is recieved -->
-        <div class="w-100 d-flex" v-if="loaded">
-            <span class="w-100 alert alert-secondary m-0 text-center">
-                {{ emptyReturn }}
-            </span>
-        </div>
-        <!-- If there are items in the list, they'll be displayed here -->
-        <!-- Using vue's iterating loader.... -->
         <div
-            class="container w-100 d-flex flex-column"
-            v-else
-            v-for="item in todos"
-            :key="item.id"
+            class="content-area w-100 d-flex justify-content-start align-items-start position-relative"
         >
-            <!-- To do item card -->
+            <!-- This is a conditional render, to utput different info when:loading,no data and when data is recieved -->
+            <div class="w-100 d-flex" v-if="loaded">
+                <span class="w-100 alert alert-secondary m-0 text-center">
+                    {{ emptyReturn }}
+                </span>
+            </div>
             <div
-                :class="`container d-flex align-items-center justify-content-between ${
-                    item.is_completed ? 'bg-success' : 'bg-primary'
-                } rounded py-2 px-3 my-2`"
+                :class="`${
+                    selected_item ? 'w-75' : 'w-100'
+                } d-flex flex-column`"
+                v-else
             >
-                <div class="w-50 d-flex align-items-center">
-                    <input
-                        type="checkbox"
-                        class="form-input"
-                        v-model="item.is_completed"
-                    />
-                    <h4 class="m-0 px-3">{{ item.title }}</h4>
+                <!-- If there are items in the list, they'll be displayed here -->
+                <!-- Using vue's iterating loader.... -->
+
+                <div
+                    class="container w-100 d-flex flex-column"
+                    v-for="item in todos"
+                    :key="item.id"
+                >
+                    <!-- To do item card -->
+                    <div
+                        :class="`container d-flex align-items-center justify-content-between ${
+                            item.is_completed ? 'bg-success' : 'bg-primary'
+                        } rounded py-2 px-3 my-2`"
+                        @click="openPanel(item.id)"
+                    >
+                        <div class="w-50 d-flex align-items-center">
+                            <input
+                                type="checkbox"
+                                class="form-input"
+                                v-model="item.is_completed"
+                            />
+                            <h4 class="m-0 px-3">{{ item.title }}</h4>
+                        </div>
+                        <div class="w-25 d-flex justify-content-end">
+                            <button
+                                class="btn btn-text"
+                                @click="openPanel(item.id)"
+                            >
+                                <h2 class="m-0">⋮</h2>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-25 d-flex justify-content-end">
-                    <button class="btn btn-text"><h2 class="m-0">⋮</h2></button>
+            </div>
+            <!-- To do side panel -->
+            <div
+                class="w-25 d-flex flex-column justify-content-start bg-dark rounded m-2 p-2 position-absolute top-0 end-0"
+                v-if="selected_item"
+            >
+                <div
+                    v-if="prompted"
+                    class="position-absolute top-0 w-100 m-0 p-0 h-100 rounded blur d-flex justify-content-center align-items-center"
+                >
+                    <div
+                        class="d-flex bg-dark shadow-lg container rounded flex-column w-75 justify-content-center align-items-center"
+                    >
+                        <p class="m-0 fs-4 text-center text-light">
+                            Do you want to delete <br />
+                            ' {{ edit_item.title }} '?
+                        </p>
+                        <div class="w-100 d-flex my-2 justify-content-center">
+                            <button
+                                class="btn btn-outline-primary mx-2"
+                                @click="prompted = !prompted"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                class="btn btn-outline-danger mx-2"
+                                @click.prevent="deleteToDo"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="w-100 rounded bg-dark d-flex justify-content-between align-items-center shadow-lg"
+                >
+                    <div class="w-100 d-flex align-items-center">
+                        <i class="fa-solid fa-pen mx-3 text-light"></i>
+                        <input
+                            type="text"
+                            class="form-control fs-3 bg-dark border p-0 m-0 border-dark text-light shadow-none"
+                            v-model="edit_item.title"
+                            id=""
+                        />
+                    </div>
+                    <button
+                        class="btn btn-dark"
+                        @click="selected_item = !selected_item"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="w-50 my-2">
+                    <span
+                        :class="`w-100 rounded p-1 ${
+                            edit_item.is_completed
+                                ? 'bg-success text-light'
+                                : 'bg-primary'
+                        }`"
+                    >
+                        {{
+                            edit_item.is_completed
+                                ? "Completed"
+                                : "Task not yet done"
+                        }}
+                    </span>
+                </div>
+
+                <div
+                    class="w-100 bg-light rounded my-2 shadow-lg d-flex flex-column p-2"
+                >
+                    <h4 class="text-dark">Item note</h4>
+                    <div class="w-100 d-flex">
+                        <form class="w-100 m-0">
+                            <textarea
+                                class="w-100 form-control mb-2"
+                                rows="4"
+                                v-model="edit_item.note"
+                            ></textarea>
+                            <div class="w-100 d-flex">
+                                <button
+                                    class="btn btn-warning w-50 m-2"
+                                    @click.prevent="updateToDo"
+                                >
+                                    <i class="fa-solid fa-pen pe-2"></i>
+                                    Update Item
+                                </button>
+                                <button
+                                    class="btn btn-danger w-50 m-2"
+                                    @click.prevent="prompted = !prompted"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                    Delete Item
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
         <!-- This is the adding a new item module  -->
         <div class="container w-100 fixed-bottom mb-4">
             <div
@@ -112,6 +225,9 @@ export default {
             loaded: true,
             listName: "",
             newTodo: "",
+            selected_item: false,
+            edit_item: [],
+            prompted: false,
         };
     },
     methods: {
@@ -172,6 +288,35 @@ export default {
                     notification(error, "#dc3545");
                 });
         },
+        openPanel(id) {
+            this.selected_item = true;
+            this.edit_item = this.todos.find((item) => item.id === id);
+            this.noteText = this.edit_item.note;
+        },
+        updateToDo() {
+            axios
+                .put(`/api/items/edit/${this.edit_item.id}`, this.edit_item)
+                .then((res) => {
+                    notification(res.data.data, "#28a745");
+                    this.getToDos();
+                })
+                .catch((error) => {
+                    notification(error, "#dc3545");
+                });
+        },
+        deleteToDo() {
+            axios
+                .delete(`/api/items/delete/${this.edit_item.id}`)
+                .then((res) => {
+                    notification(res.data.data, "#28a745");
+                    this.selected_item = false;
+                    this.prompted = false;
+                    this.getToDos();
+                })
+                .catch((error) => {
+                    notification(error, "#dc3545");
+                });
+        },
     },
     mounted() {
         this.getToDos();
@@ -186,5 +331,8 @@ export default {
 }
 .white {
     color: white;
+}
+.blur {
+    backdrop-filter: blur(3px);
 }
 </style>
