@@ -23,13 +23,11 @@ class itemController extends Controller
     //I have bundled their respective error messages when not met
     public $rules = [
         'title' => 'required|string|max:150',
-        'note' => 'string|max:350'
     ];
     public $customMessages = [
         'required' => 'Please enter a title',
         'string' => 'Please use alphabet letters',
         'title.max' => 'Title should have a maximum of 150 characters',
-        'note.max' => 'Note should have a maximum of 350 characters',
     ];
 
 
@@ -65,7 +63,7 @@ class itemController extends Controller
                 'title' => $data->title,
                 'note' => $data->note,
                 'is_completed' => $data->is_completed,
-                'list_id' => $data->list_id
+                'list_id' => intval($data->list_id)
 
             ]);
 
@@ -132,6 +130,8 @@ class itemController extends Controller
                 //else it updates the data in the db
                 $new_list = $selected->update([
                     'title' => $request->title,
+                    'note' => $request->note,
+                    'is_completed' => $request->is_completed
                 ]);
 
                 //if uodate was successful,return an OK message or an ERROR message otherwise
@@ -143,6 +143,19 @@ class itemController extends Controller
             }
         } else {
             return $this->apiDeliver(404, "No such record was found");
+        }
+    }
+
+    //This method erases all to do items that share the same list_id
+    public function clearList($id)
+    {
+        //I am using laravel's eloquent model to handle the delete operation
+        $clearListRes = ItemModel::where('list_id', '=', $id)->delete();
+
+        if ($clearListRes) {
+            return $this->apiDeliver(200, "Records deleted successfully");
+        } else {
+            return $this->apiDeliver(404, "Record could not be updated");
         }
     }
 }

@@ -1,5 +1,6 @@
 <template>
     <!-- This is the newlist module -->
+    <!-- When a user wants to add a new list, this is displayed -->
     <div
         class="wrapper container position-fixed d-flex justify-content-center align-items-center"
     >
@@ -32,7 +33,10 @@
                         />
 
                         <!-- Mthd that's called when submit -->
-                        <button class="btn btn-primary" @click="handleSubmit">
+                        <button
+                            class="btn btn-primary"
+                            @click.prevent="handleSubmit"
+                        >
                             ADD ITEM
                             <i class="fa-solid fa-paper-plane ps-3"></i>
                         </button>
@@ -88,7 +92,22 @@ export default {
             axios
                 .post("/api/lists", { title: this.title })
                 .then((response) => {
-                    console.log(response);
+                    //handling a successful insertion
+                    Toastify({
+                        text: `${response.data.data}    `,
+                        duration: 2000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top", // bottom-right, bottom-left, top-right, top-left
+                        position: "center", // left, right, center
+                        backgroundColor: "#ffc107",
+                        stopOnFocus: false, // Prevents dismissing of toast on hover
+                    }).showToast();
+
+                    //triggers a listUpdated hook that triggers the method that'll be passed as an arg
+                    this.$emit("listUpdated");
+                    //Triggers another hook that toggles the visibility of the new List Module
+                    this.$emit("update:visibleMethod", !this.visibleProp);
                 })
                 .catch(console.error());
         },

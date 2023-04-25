@@ -1,20 +1,12 @@
 <template>
-    <div class="container d-flex justify-content-center">
-        <!-- Loading the Landing vue template -->
-        <Landing></Landing>
+    <div class="container w-100 d-flex justify-content-center">
+        <!-- Loading the ROUTED vue template -->
+        <router-view></router-view>
     </div>
 </template>
 
 <script>
-
-// self-explanatory lol
-// Importing and bundling the Landing view/vue
-import Landing from "../screens/Landing.vue";
-export default {
-    components: {
-        Landing,
-    },
-};
+export default {};
 </script>
 
 <style></style>
