@@ -287,7 +287,7 @@ export default {
                 list_id: this.$route.params.listId,
             };
             axios
-                .post(`/api/items`, toDoItem)
+                .post(`/api/task`, toDoItem)
                 .then((response) => {
                     notification(response.data.data, "#28a745");
                     this.getToDos();
@@ -300,7 +300,7 @@ export default {
         // deletes all tasks in the list
         clearList() {
             axios
-                .delete(`/api/clear/${this.$route.params.listId}`)
+                .delete(`/api/task/clear/${this.$route.params.listId}`)
                 .then((response) => {
                     notification(response.data.data, "#28a745");
                     this.todos = [];
@@ -321,7 +321,7 @@ export default {
         // Updates the edited item
         updateToDo() {
             axios
-                .put(`/api/items/edit/${this.edit_item.id}`, this.edit_item)
+                .put(`/api/task/edit/${this.edit_item.id}`, this.edit_item)
                 .then((res) => {
                     notification(res.data.data, "#28a745");
                     this.getToDos();
@@ -334,7 +334,7 @@ export default {
         // Deletes the selected to do item
         deleteToDo() {
             axios
-                .delete(`/api/items/delete/${this.edit_item.id}`)
+                .delete(`/api/task/delete/${this.edit_item.id}`)
                 .then((res) => {
                     notification(res.data.data, "#28a745");
                     this.selected_item = false;

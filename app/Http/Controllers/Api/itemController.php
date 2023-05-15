@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ItemModel;
+use App\Models\test;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -30,7 +31,6 @@ class itemController extends Controller
         'title.max' => 'Title should have a maximum of 150 characters',
     ];
 
-
     //consumer methods section
     //this is the main method that's going to return all list items available in the database
     public function index()
@@ -45,7 +45,15 @@ class itemController extends Controller
             return $this->apiDeliver(404, "No records found");
         }
     }
-
+    public function getTest()
+    {
+        $tests = test::all();
+        if ($tests->count() > 0) {
+            return $this->apiDeliver(200, $tests);
+        } else {
+            return $this->apiDeliver(404, "No records found");
+        }
+    }
 
     //this  method adds a new item to the db for the POST api 
     public function save(Request $data)
@@ -75,6 +83,26 @@ class itemController extends Controller
             }
         }
     }
+    public function addTest(Request $data)
+    {
+        //if data is valid , then insert into db
+        $new_item = test::create([
+            'title' => $data->title,
+            'author' => $data->author,
+            'likes' => $data->likes,
+            'description' => $data->desc,
+            'image_url' => $data->url,
+            'ingredients' => $data->ingredients
+
+        ]);
+
+        //if it's inserted, return an OK response else ERROR response
+        if ($new_item) {
+            return $this->apiDeliver(200, "Record inserted successfully");
+        } else {
+            return $this->apiDeliver(404, "Record could not be inserted");
+        }
+    }
 
     //This method deletes data using the id passed as an arg
     public function delete($id)
@@ -98,6 +126,19 @@ class itemController extends Controller
         //The db is queried
         //if the data is found, it's stored in the selected var that is true in boolean
         $selected = ItemModel::find($id);
+        if ($selected) {
+
+            //the selected data is reyurned as data in the API json
+            return $this->apiDeliver(200, $selected);
+        } else {
+
+            //else an error message is sent back 
+            return $this->apiDeliver(404, "No such record was found");
+        }
+    }
+    public function getSpecificTest($id)
+    {
+        $selected = test::find($id);
         if ($selected) {
 
             //the selected data is reyurned as data in the API json
